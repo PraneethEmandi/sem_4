@@ -97,7 +97,7 @@ int main(){
     for(int i=size-1;i>1;i--){
         for(int j=2;j<i;j++){
             if(i%j==0){
-                printf("%d\n",i);
+                // printf("%d\n",i);
                 chk=0;
                 break;
             }

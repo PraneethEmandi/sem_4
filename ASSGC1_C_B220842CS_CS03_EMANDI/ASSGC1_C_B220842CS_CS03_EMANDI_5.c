@@ -9,7 +9,7 @@ int main(){
     int distinct=0;
     int i;
     for(i=0;i<k;i++){
-        scanf("%d",&a[i]);
+        scanf("%ld",&a[i]);
         if(cnt[a[i]]==0){
             distinct++;
         }
@@ -17,7 +17,7 @@ int main(){
     }
     printf("%d ",distinct);
     for(i=k;i<n;i++){
-        scanf("%d",&a[i]);
+        scanf("%ld",&a[i]);
         if(cnt[a[i-k]]==1){
             distinct--;
         }
