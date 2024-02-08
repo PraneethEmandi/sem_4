@@ -144,7 +144,7 @@ int main() {
             break;
         case 's':
             sum = 0;
-            llsum(root, 1, &sum);
+            llsum(root, 0, &sum);
             printf("%ld\n", sum);
             break;
         case 'd':
