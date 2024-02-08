@@ -112,7 +112,28 @@ void postorderTraversal(TreeNode root) {
         printf("%ld ", root->val);
     }
 }
-
+long diameter(TreeNode tree)
+{
+    // base case where tree is empty
+    if (tree == NULL)
+        return 0;
+ 
+    // get the height of left and right sub-trees
+    long lheight = height(tree->left);
+    long rheight = height(tree->right);
+ 
+    // get the diameter of left and right sub-trees
+    long ldiameter = diameter(tree->left);
+    long rdiameter = diameter(tree->right);
+ 
+    // Return max of following three
+    // 1) Diameter of left subtree
+    // 2) Diameter of right subtree
+    // 3) Height of left subtree + height of right subtree +
+    // 1
+    long temp=ldiameter>rdiameter?ldiameter:rdiameter;
+    return temp>lheight+rheight+1?temp:lheight+rheight+1;
+}
 int main() {
     int n;
     scanf("%d", &n);
@@ -124,7 +145,7 @@ int main() {
     int preindex = 0;
     TreeNode root = build(in, pre, 0, n - 1, &preindex);
     char c;
-    long h1, h2, sum;
+    long h, sum;
     while (1) {
         scanf(" %c", &c);
         if(c=='e')
@@ -144,13 +165,12 @@ int main() {
             break;
         case 's':
             sum = 0;
-            llsum(root, 1, &sum);
+            llsum(root, 0, &sum);
             printf("%ld\n", sum);
             break;
         case 'd':
-            h1 = height(root->left);
-            h2 = height(root->right);
-            printf("%ld\n", h1 + h2 + 1);
+            h = diameter(root);
+            printf("%ld\n", h);
             break;
         }
     }
