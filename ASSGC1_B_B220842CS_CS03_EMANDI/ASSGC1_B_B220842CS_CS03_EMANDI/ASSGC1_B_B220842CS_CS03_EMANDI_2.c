@@ -21,7 +21,7 @@ struct Info{
 };
 typedef struct Info Info;
 Info maxsumbst(TreeNode root,long *maxsum){
-    if(root==NULL){
+    if(root==NULL || root->val==-1){
         Info temp;
         temp.isbst=1;
         temp.min=1000000000;
@@ -30,7 +30,7 @@ Info maxsumbst(TreeNode root,long *maxsum){
         temp.currmax=0;
         return temp;
     }
-    if(root->left==NULL&&root->right==NULL){
+    if((root->left==NULL&&root->right==NULL)||(root->left->val==-1&&root->right->val==-1)){
         Info temp;
         temp.isbst=1;
         temp.min=root->val;
@@ -103,6 +103,7 @@ void currlev(TreeNode root, int level) {
     if (root == NULL)
         return;
     if (level == 1) {
+        if(root->val!=-1)
         printf("%ld ", root->val);
     } else if (level > 1) {
         currlev(root->left, level - 1);
@@ -116,41 +117,64 @@ void printlevelorder(TreeNode root) {
         currlev(root, i);
 }
 
-TreeNode par_to_tree(TreeNode root, int n, char a[], PrevStack prevStack) {
-    int i = 1;
+TreeNode par_to_tree(TreeNode root, int n, char a[], PrevStack prevStack,int i)
+{
+    // int i = 1;
     TreeNode curr = root;
-    for (i = 1; i < n; i++) {
-        if (a[i] == '(') {
+    for (; i < n; i++)
+    {
+        if (a[i] == '(')
+        {
             i++;
-            int val=0;
-            while (i < n && a[i]>='0'&&a[i]<='9') {
-                val = val * 10 + (a[i] - '0');
-                i++;
+            if (a[i] == ')')
+            {
+                if (curr->left == NULL)
+                    curr->left = create(-1);
+                else
+                    curr->right = create(-1);
             }
-            i--;
-            // printf("%ld\n", val);
-            TreeNode temp = create(val);
-            if (curr->left == NULL) {
-                curr->left = temp;
-                pushPrev(prevStack, curr);
-                curr = curr->left;
-            } else {
-                curr->right = temp;
-                pushPrev(prevStack, curr);
-                curr = curr->right;
+            else
+            {
+                int val = 0;
+
+                while (i < n && a[i] >= '0' && a[i] <= '9')
+                {
+                    val = val * 10 + (a[i] - '0');
+                    i++;
+                }
+                // printf("val %d\n",val);
+                i--;
+                TreeNode temp = create(val);
+                if (curr->left == NULL)
+                {
+                    curr->left = temp;
+                    pushPrev(prevStack, curr);
+                    curr = curr->left;
+                }
+                else
+                {
+                    curr->right = temp;
+                    pushPrev(prevStack, curr);
+                    curr = curr->right;
+                }
             }
-        } else if (a[i] == ')') {
+        }
+        else if (a[i] == ')')
+        {
             curr = popPrev(prevStack);
         }
     }
+
     return root;
 }
 void rightview(TreeNode root, int h, int rv[],int *rvsize){
 	if(root==NULL)
 		return;
 	if(h==*rvsize){
+        if(root->val!=-1){
 		rv[*rvsize]=root->val;
         (*rvsize)++;
+        }
 	}
 	rightview(root->right,h+1,rv,rvsize);
 	rightview(root->left,h+1,rv,rvsize);
@@ -159,9 +183,16 @@ int main() {
     char a[1000001];
     scanf("%s", a);
     int l = strlen(a);
-    TreeNode root = create(a[0] - '0');
+    int i=0,val=0;
+    // int l = strlen(a);
+    while (i < l && a[i] >= '0' && a[i] <= '9')
+    {
+        val = val * 10 + (a[i] - '0');
+        i++;
+    }
+    TreeNode root=create(val);
     PrevStack prevStack = createPrevStack(l);
-    root = par_to_tree(root, l, a, prevStack);
+    root = par_to_tree(root, l, a, prevStack,i);
     char c;
     int rv[100];
     int rvsize=0;
@@ -169,6 +200,8 @@ int main() {
     Info temp;
     while(1){
         scanf(" %c",&c);
+        if(c=='e')
+            break;
         switch(c){
             case 'l':
                 printlevelorder(root);

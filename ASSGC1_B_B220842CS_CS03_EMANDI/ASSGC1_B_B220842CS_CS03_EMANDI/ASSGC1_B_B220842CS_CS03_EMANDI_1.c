@@ -127,6 +127,8 @@ int main() {
     long h1, h2, sum;
     while (1) {
         scanf(" %c", &c);
+        if(c=='e')
+        break;
         switch (c) {
         case 'p':
             postorderTraversal(root);
