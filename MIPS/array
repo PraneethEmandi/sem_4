@@ -1,0 +1,57 @@
+.data 
+	arr: .space 100
+	size: .asciiz "size "
+	num: .asciiz "num "
+	search: .asciiz "search "
+	yes: .asciiz "yes\n"
+	no: .asciiz "no\n"
+	
+.text
+.globl main
+main:
+	li $v0,4
+	la $a0,size
+	syscall
+	li $v0,5
+	syscall
+	move $t0,$v0
+	
+	li $t1,0
+	loop:
+		beq $t0,$t1,out
+		sll $t2,$t1,2
+		li $v0,4
+		la $a0,num
+		syscall
+		li $v0,5
+		syscall
+		sw $v0,arr($t2)
+		addi $t1,$t1,1
+		j loop
+	out:
+		li $v0,4
+		la $a0,search
+		syscall
+		li $v0,5
+		syscall
+		move $t3,$v0
+		li $t1,0
+		loop2:
+			beq $t1,$t0,fail
+			sll $t2,$t1,2
+			lw $t4,arr($t2)
+			beq $t4,$t3,yess
+			addi $t1,$t1,1
+			j loop2
+		fail:
+			li $v0,4
+			la $a0,no
+			syscall
+			j exit
+		yess:
+			li $v0,4
+			la $a0,yes
+			syscall
+		exit:
+			li $v0,10
+			syscall

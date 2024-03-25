@@ -1,0 +1,64 @@
+.data
+    input_string: .asciiz "Hello, World!"
+    output_string: .space 100
+
+.text
+.globl main
+main:
+    # Print the original string
+    li $v0,4
+    la $a0,input_string
+    syscall
+
+    # Change the case of each character
+    li $t0,0          # Counter for input string
+    li $t1,0          # Counter for output string
+loop:
+    lb $t2,input_string($t0)   # Load a byte from input string
+    beqz $t2,end_loop          # Exit loop if null terminator is reached
+
+    # Check if the character is an uppercase letter
+    li $t3,65         # ASCII value of 'A'
+    li $t4,90         # ASCII value of 'Z'
+    blt $t2,$t3,not_uppercase
+    bgt $t2,$t4,not_uppercase
+
+    # Convert uppercase to lowercase
+    addi $t2,$t2,32
+    sb $t2,output_string($t1)   # Store the modified character in output string
+    addi $t0,$t0,1              # Move to the next character in input string
+    addi $t1,$t1,1              # Move to the next position in output string
+    j loop
+
+not_uppercase:
+    # Check if the character is a lowercase letter
+    li $t3,97         # ASCII value of 'a'
+    li $t4,122        # ASCII value of 'z'
+    blt $t2,$t3,not_letter
+    bgt $t2,$t4,not_letter
+
+    # Convert lowercase to uppercase
+    subi $t2,$t2,32
+    sb $t2,output_string($t1)   # Store the modified character in output string
+    addi $t0,$t0,1              # Move to the next character in input string
+    addi $t1,$t1,1              # Move to the next position in output string
+    j loop
+
+not_letter:
+    # Copy non-alphabetic characters as is
+    sb $t2,output_string($t1)   # Store the character in output string
+    addi $t0,$t0,1              # Move to the next character in input string
+    addi $t1,$t1,1              # Move to the next position in output string
+    j loop
+
+end_loop:
+    sb $zero,output_string($t1)  # Null-terminate the output string
+
+    # Print the modified string
+    li $v0,4
+    la $a0,output_string
+    syscall
+
+    # Exit the program
+    li $v0,10
+    syscall
