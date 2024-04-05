@@ -108,4 +108,5 @@ int main(){
     qsort(edge,cnt,sizeof(edge[0]),compare);
         
     printf("%d",MST(n,edge,cnt));
+    return 1;
 }

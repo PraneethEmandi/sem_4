@@ -82,4 +82,5 @@ int main(){
     scanf("%d",&src);
     dijkstra(V,graph,edgeWeight,src);
     // printf("%d\n",dijkstra(V,graph,edgeWeight));
+    return 1;
 }
