@@ -35,8 +35,6 @@ void Union(DisjointSet ds,int u,int v){
         ds->size[ulp_u]+=ds->size[ulp_v];
     }
 }
-
-
 int MST(int n,int edge[][3],int cnt){
     DisjointSet ds=create(n);
     int minCost=0;
@@ -106,7 +104,6 @@ int main(){
         }
     }
     qsort(edge,cnt,sizeof(edge[0]),compare);
-        
     printf("%d",MST(n,edge,cnt));
     return 1;
 }

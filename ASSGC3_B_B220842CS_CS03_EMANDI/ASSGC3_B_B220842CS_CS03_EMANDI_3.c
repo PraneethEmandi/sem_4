@@ -64,23 +64,8 @@ int main(){
                 break;
         }
     }
-    for(int i=1;i<=V;i++){
-        for(int j=1;j<=V;j++){
-            if(graph[i][j]!=0)
-            printf("%d ",graph[i][j]);
-        }
-        printf("\n");
-    }
-    for(int i=1;i<=V;i++){
-        for(int j=1;j<=V;j++){
-            if(graph[i][j]!=0)
-            printf("%d ",edgeWeight[i][j]);
-        }
-        printf("\n");
-    }
     int src;
     scanf("%d",&src);
     dijkstra(V,graph,edgeWeight,src);
-    // printf("%d\n",dijkstra(V,graph,edgeWeight));
     return 1;
 }

@@ -1,103 +1,76 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#define MAX 1000
-int minkey(int key[], int vis[], int V) {
-    int min = INT_MAX;
-    int mindex = -1; // Initialize mindex to -1
-    for(int i = 0; i < V; i++) {
-        if(vis[i] == 0 && key[i] < min) {
-            min = key[i];
-            mindex = i;
+#include<stdio.h>
+#include<stdlib.h>
+#include <string.h>
+int PrimsMST(int vis[], int n, int edgeWeight[][n],int idx, int flag){
+    int min = 100000;
+    int x,y;
+    int temp = 0;
+    int ans = 0;
+    vis[idx] = 1;
+    while(temp < n-1){
+        min = 100000;
+        x = 0;
+        y = 0;
+        for(int i = 0; i < n; i++){
+            if(vis[i]){
+                for(int j = 0; j < n; j++){
+                    if(!vis[j] && edgeWeight[i][j]){
+                        if(min > edgeWeight[i][j]){
+                            min = edgeWeight[i][j];
+                            x = i;
+                            y = j;
+                        }
+                    }
+                }
+            }
         }
+        ans += edgeWeight[x][y];
+        vis[y] = 1;
+        if(flag){
+            printf("%d %d ", x, y);
+        }
+        temp++;
     }
-    // printf("%d\n", mindex);
-    return mindex;
+    return ans;
 }
 
-void primMST(int graph[][MAX], int V, int src, int *sum) {
-    
-    int parent[V];
-    int key[V];
-    int vis[V];
-    for(int i = 0; i < V; i++) {
-        key[i] = INT_MAX;
+int main(){
+    int n;
+    scanf("%d",&n);
+    int edgeWeight[n][n];
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            scanf("%d",&edgeWeight[i][j]);
+        }
+    }
+    int vis[n];
+    for(int i = 0; i < n; i++){
         vis[i] = 0;
     }
-    key[src] = 0;
-    parent[src] = -1;
-    
-    for(int count = 0; count < V - 1; count++) {
-        int u = minkey(key, vis, V);
-        vis[u] = 1;
-        // printf("u=%d\n", u);
-        int x;
-        for(int v = 0; v < V; v++) {
-            // printf("%d %d %d %d\n", u, v, graph[u][v], key[v]);
-            if(graph[u][v] && vis[v] == 0 && graph[u][v] < key[v]) {
-                parent[v] = u;
-                key[v] = graph[u][v];
-                
-                // printf("%d %d ",v,u);
-                
+    char s;
+    while(1){
+        scanf("%c",&s);
+        if(s == 'x'){
+            return 1;
+        }
+        else if(s == 't'){
+            int ans = PrimsMST(vis, n, edgeWeight,0, 0);
+            printf("%d\n",ans);
+        }
+        else if(s == 's'){
+            char str[1000];
+            fgets(str, sizeof(str), stdin);
+            int idx = 0;
+            int len = strlen(str);
+            for(int i = 0; i < len-1; i++){
+                if(str[i] != ')' && str[i] != '(')
+                    idx = idx * 10 + (str[i] - '0');
             }
-        }
-        
-    }
-    for(int i = 0; i < V; i++) {
-                
-        *sum += key[i];
-    }
-    printf("%d\n",*sum);
-    int minnn=10000;
-    int min_i;
-    int done[1001];
-    for(int i=0;i<V;i++){
-        done[i]=0;
-    }
-    done[src]=1;
-    for(int i=0;i<V-1;i++){
-        // for(int k=0;k<V;k++)
-            // printf("%d ",done[k]);
-        // printf("\n");
-        for(int j=0;j<V;j++){
-            if(done[j]==0 && minnn>key[j]){
-                minnn=key[j];
-                min_i=j;
+            for(int i = 0; i < n; i++){
+                vis[i] = 0;
             }
-        }
-        done[min_i]=1;
-        minnn=10000;
-        printf("%d %d ",parent[min_i],min_i);
-    }
-}
-int main() {
-    int V;
-    scanf("%d", &V);
-    int temp=V;
-    // printf("%d\n", V);
-    int graph[V][MAX];
-    // int maxWeight = 0;
-    for(int i = 0; i < V; i++) {
-        for(int j = 0; j < V; j++) {
-            scanf("%d", &graph[i][j]);
-            // maxWeight=maxWeight>graph[i][j]?maxWeight:graph[i][j];
+            int ans = PrimsMST(vis, n, edgeWeight, idx, 1); 
+            printf("\n");
         }
     }
-    // printf("gg%d\n", V);
-    char c[4];
-    scanf("%s", c);
-    scanf("%s", c);
-    // printf("gg%d\n", V);
-    int src = c[2] - '0'; // Convert char to int
-    // printf("%d\n", src); 
-    
-    
-    int sum = 0;
-    
-    scanf("%s",c);
-    primMST(graph, temp, src, &sum);
-    
-    // printf("%d\n", sum);
-    return 1;
 }
