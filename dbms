@@ -1,0 +1,157 @@
+// loading int 7 code from disk 29-30 to mem 16-17
+loadi(16, 29);
+loadi(17, 30);
+
+// loading Library code from disk 13-14 to mem 63-64
+loadi(63,13);
+loadi(64,14);
+
+// loading INIT program from disk 7-8 to mem 65-66
+loadi(65,7);
+loadi(66,8);
+
+// loading INT 10 code from disk 35-36 to mem 22-23
+loadi(22,35);
+loadi(23,36);
+
+// loading timer interrupt code from disk 17-18 to mem 4-5
+loadi(4,17);
+loadi(5,18);
+
+// loading ExHanding code from disk 15-16 to mem 2-3
+loadi(2,15);
+loadi(3,16);
+
+// initializing PTBR to default - 29696
+PTBR = PAGE_TABLE_BASE;
+
+// INIT Program needs 10 pages of memory
+PTLR = 10;
+
+// initialize page table for INIT Program
+[PTBR+0] = 63;
+[PTBR+1] = "0100";
+[PTBR+2] = 64;
+[PTBR+3] = "0100";
+[PTBR+4] = 78;
+[PTBR+5] = "0110";
+[PTBR+6] = 79;
+[PTBR+7] = "0110";
+[PTBR+8] =  65;
+[PTBR+9] = "0100";	// code page should be read only 
+[PTBR+10] = 66;
+[PTBR+11] = "0100";
+[PTBR+12] = -1;
+[PTBR+13] = "0000";
+[PTBR+14] = -1;
+[PTBR+15] = "0000";
+[PTBR+16] = 76;
+[PTBR+17] = "0110";
+[PTBR+18] = 77;
+[PTBR+19] = "0110";
+
+[76*512] = [65*512+1];	// IP When INIT program starts
+SP = 8*512;
+
+
+// Setting up process table
+
+[PROCESS_TABLE + 11] = 80;  // 11th word stores user area page number
+[PROCESS_TABLE + 1] = 0;    // 1st word stores PID of the process -> index of Process table entry
+
+
+//System status table
+[SYSTEM_STATUS_TABLE + 1] = 0;
+
+ireturn;
+
+//Set mode flag to system call number
+[(PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16)+ 9] = 5;
+
+alias userSP R0;
+userSP = SP;
+
+//Store user stack pointer in UPTR
+[(PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16)+13] = userSP;
+
+//Set SP to start of kernel stack (User area)
+SP = [(PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16)+11]*512;
+
+alias physicalPageNum R1;
+alias offset R2;
+alias fileDescPhysicalAddr R3;
+
+physicalPageNum = [PTBR + 2*((userSP-4)/512)];
+offset = (userSP-4) % 512;
+fileDescPhysicalAddr = (physicalPageNum*512) + offset;
+
+alias fileDescriptor R4;
+fileDescriptor = [fileDescPhysicalAddr];
+if(fileDescriptor!=-2) then
+
+	physicalPageNum = [PTBR + 2*((userSP-1)/512)];
+	offset = (userSP-1) % 512;
+	
+	alias returnAddr R5;
+	returnAddr = (physicalPageNum*512) + offset;
+	[returnAddr] = -1;
+else
+	physicalPageNum = [PTBR + 2*((userSP-3)/512)];
+        offset = (userSP-3) % 512;
+
+	alias word R5;
+	word = [(physicalPageNum*512) + offset];
+	print word;
+
+	physicalPageNum = [PTBR + 2*((userSP-1)/512)];
+        offset = (userSP-1) % 512;
+
+        alias returnAddr R6;
+        returnAddr = (physicalPageNum*512) + offset;
+        [returnAddr] = 0;
+endif;
+
+SP = userSP;
+[(PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16)+ 9] = 0;
+ireturn;
+
+0
+2056
+0
+0
+0
+0
+0
+0
+MOV R0, 1
+MOV R2, 5
+GE R2, R0
+JZ R2, 2110
+MOV R1, R0
+MUL R1, R0
+
+PUSH R0
+PUSH R1
+PUSH R2
+
+MOV R0, 5
+MOV R2, -2
+PUSH R0
+PUSH R2
+PUSH R1
+PUSH R1
+PUSH R1
+INT 7
+
+POP R1
+POP R1
+POP R1
+POP R1
+POP R1
+POP R2
+POP R1
+POP R0
+
+ADD R0, 1
+JMP 2058
+INT 10
